@@ -19,7 +19,7 @@
 //  ]
 
 const categories = [];
-
+let offset = 0;
 
 /** Get NUM_CATEGORIES random category from API.
  *
@@ -28,10 +28,13 @@ const categories = [];
 
 async function getCategoryIds() {
     const categoryIds = [];
-    const getCats = await axios.get('https://jservice.io/api/categories?count=100');
+    const getCats = await axios.get('https://jservice.io/api/categories', {params: {count: 100, offset}});
     const randomCats = await _.sampleSize(getCats.data, 6);
-    console.log(randomCats);
-    
+    offset = 100;
+    for (let i = 0; i < 5; i++){
+        categoryIds.push(randomCats[i].id);
+    }
+    return categoryIds;
 }
 
 /** Return object with data about a category:
@@ -92,9 +95,14 @@ function hideLoadingView() {
  * */
 
 async function setupAndStart() {
+    // console.log(getCategoryIds());
+    return getCategoryIds();
 }
 
 /** On click of start / restart button, set up game. */
+// const btn = document.querySelector('#start');
+// btn.addEventListener('click', setupAndStart());
+$('#start').on('click', setupAndStart());
 
 // TODO
 
