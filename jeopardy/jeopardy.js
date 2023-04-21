@@ -18,7 +18,7 @@
 //    ...
 //  ]
 
-let categories = [];
+const categories = [];
 
 
 /** Get NUM_CATEGORIES random category from API.
@@ -26,7 +26,12 @@ let categories = [];
  * Returns array of category ids
  */
 
-function getCategoryIds() {
+async function getCategoryIds() {
+    const categoryIds = [];
+    const getCats = await axios.get('https://jservice.io/api/categories?count=100');
+    const randomCats = await _.sampleSize(getCats.data, 6);
+    console.log(randomCats);
+    
 }
 
 /** Return object with data about a category:
