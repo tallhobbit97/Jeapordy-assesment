@@ -30,11 +30,18 @@ async function getCategoryIds() {
     const categoryIds = [];
     const getCats = await axios.get('https://jservice.io/api/categories', {params: {count: 100, offset}});
     const randomCats = await _.sampleSize(getCats.data, 6);
-    offset = 100;
-    for (let i = 0; i < 5; i++){
-        categoryIds.push(randomCats[i].id);
+    offset += 100;
+    for (let i = 0; i < 6; i++){
+        if (randomCats[i].clues_count < 5){
+            const getnewCats = await axios.get('https://jservice.io/api/categories', {params: {count: 100, offset}});
+            const newRandomCat = await _.sampleSize(getnewCats.data, 1);
+            let newCatId = newRandomCat[0].id
+            categoryIds.push(newCatId);
+        } else {
+            categoryIds.push(randomCats[i].id);
+        }
     }
-    return categoryIds;
+    categoryIds.forEach( cat => getCategory(cat));
 }
 
 /** Return object with data about a category:
@@ -49,7 +56,23 @@ async function getCategoryIds() {
  *   ]
  */
 
-function getCategory(catId) {
+async function getCategory(catId) {
+    categories.length = 0; //I got this solution form https://www.javascripttutorial.net/array/4-ways-empty-javascript-array/
+    const category = {};
+    const clue = {}
+    const clueArr = [];
+    const getCat = await axios.get('https://jservice.io/api/category', {params: {id: catId}});
+    const questions = await _.sampleSize(getCat.data.clues, 5);
+    for (let i = 0; i < 5; i++){
+        clue["question"] = questions[i].question;
+        clue["answer"] = questions[i].answer;
+        clue["showing"] = null;
+        clueArr.push(clue);
+    }
+    category["title"] = await getCat.data.title;
+    category["clues"] = clueArr;
+    categories.push(category);
+    console.log(categories);
 }
 
 /** Fill the HTML table#jeopardy with the categories & cells for questions.
@@ -95,14 +118,15 @@ function hideLoadingView() {
  * */
 
 async function setupAndStart() {
-    // console.log(getCategoryIds());
-    return getCategoryIds();
+    getCategoryIds();
+    // return getCategoryIds();
 }
 
 /** On click of start / restart button, set up game. */
-// const btn = document.querySelector('#start');
-// btn.addEventListener('click', setupAndStart());
-$('#start').on('click', setupAndStart());
+const btn = document.querySelector('#setup');
+btn.addEventListener('click', () => {
+    setupAndStart()
+});
 
 // TODO
 
