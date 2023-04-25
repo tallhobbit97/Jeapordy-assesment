@@ -41,7 +41,9 @@ async function getCategoryIds() {
             categoryIds.push(randomCats[i].id);
         }
     }
-    categoryIds.forEach( cat => getCategory(cat));
+    categoryIds.forEach( cat => {
+        getCategory(cat);
+    });
 }
 
 /** Return object with data about a category:
@@ -59,11 +61,11 @@ async function getCategoryIds() {
 async function getCategory(catId) {
     categories.length = 0; //I got this solution form https://www.javascripttutorial.net/array/4-ways-empty-javascript-array/
     const category = {};
-    const clue = {}
     const clueArr = [];
     const getCat = await axios.get('https://jservice.io/api/category', {params: {id: catId}});
     const questions = await _.sampleSize(getCat.data.clues, 5);
     for (let i = 0; i < 5; i++){
+        const clue = {};
         clue["question"] = questions[i].question;
         clue["answer"] = questions[i].answer;
         clue["showing"] = null;
@@ -72,7 +74,6 @@ async function getCategory(catId) {
     category["title"] = await getCat.data.title;
     category["clues"] = clueArr;
     categories.push(category);
-    console.log(categories);
 }
 
 /** Fill the HTML table#jeopardy with the categories & cells for questions.
@@ -84,6 +85,12 @@ async function getCategory(catId) {
  */
 
 async function fillTable() {
+    for (let i = 0; i < 6; i++){
+        const $theadTd = $(`#cat-${i+1}`);
+        console.log($theadTd);
+        console.log(categories[i]);
+        $theadTd.text(categories[i].title);
+    }
 }
 
 /** Handle clicking on a clue: show the question or answer.
@@ -118,8 +125,7 @@ function hideLoadingView() {
  * */
 
 async function setupAndStart() {
-    getCategoryIds();
-    // return getCategoryIds();
+    fillTable();    
 }
 
 /** On click of start / restart button, set up game. */
@@ -128,8 +134,5 @@ btn.addEventListener('click', () => {
     setupAndStart()
 });
 
-// TODO
-
-/** On page load, add event handler for clicking clues */
-
-// TODO
+// Initializes categories so that first click of start button doesn't throw an error
+getCategoryIds();
