@@ -59,7 +59,6 @@ async function getCategoryIds() {
  */
 
 async function getCategory(catId) {
-    categories.length = 0; //I got this solution form https://www.javascripttutorial.net/array/4-ways-empty-javascript-array/
     const category = {};
     const clueArr = [];
     const getCat = await axios.get('https://jservice.io/api/category', {params: {id: catId}});
@@ -71,7 +70,7 @@ async function getCategory(catId) {
         clue["showing"] = null;
         clueArr.push(clue);
     }
-    category["title"] = await getCat.data.title;
+    category["title"] = getCat.data.title;
     category["clues"] = clueArr;
     categories.push(category);
 }
@@ -86,10 +85,13 @@ async function getCategory(catId) {
 
 async function fillTable() {
     for (let i = 0; i < 6; i++){
-        const $theadTd = $(`#cat-${i+1}`);
-        console.log($theadTd);
-        console.log(categories[i]);
+        const $theadTd = $(`#cat-${i}`);
         $theadTd.text(categories[i].title);
+        for (let j = 0; j <= 5; j++){
+            const $qTd = $(`#q${i}-${j}`);
+            $qTd.text('?');
+            $qTd.on('click', (evt) => handleClick(evt));
+        }
     }
 }
 
@@ -102,19 +104,51 @@ async function fillTable() {
  * */
 
 function handleClick(evt) {
+    const question = evt.target.id;
+    const clue = categories[question[1]].clues[question[3]];
+    if (clue.showing === 'answer'){
+        return false;
+    } else if (clue.showing === 'question'){
+        $(`#${question}`).empty().append(clue.answer);
+        clue.showing = 'answer';
+        return false;
+    } else if (clue.showing === null){
+        $(`#${question}`).empty().append(clue.question);
+        clue.showing = 'question';
+        return false;
+    }
+    // return false;
 }
 
 /** Wipe the current Jeopardy board, show the loading spinner,
  * and update the button used to fetch data.
  */
 
-function showLoadingView() {
-
+async function showLoadingView() {
+    //lines 128-132 and 148-151 come from this source https://stackabuse.com/loading-animation-in-vanilla-javascript/
+    const loader = document.querySelector('#loading-container');
+    const header = document.querySelector('#header-container');
+    loader.style.display = 'block';
+    header.style.display = 'none';
+    categories.length = 0; //I got this solution form https://www.javascripttutorial.net/array/4-ways-empty-javascript-array/
+    for (let i = 0; i < 6; i++){
+        const $theadTd = $(`#cat-${i}`);
+        $theadTd.empty();
+        for (let j = 0; j <= 5; j++){
+            const $qTd = $(`#q${i}-${j}`);
+            $qTd.empty();
+        }
+    }
+    return await getCategoryIds();
 }
 
 /** Remove the loading spinner and update the button used to fetch data. */
 
 function hideLoadingView() {
+    const loader = document.querySelector('#loading-container');
+    const header = document.querySelector('#header-container');
+    loader.style.display = 'none';
+    header.style.display = 'block';
 }
 
 /** Start game:
@@ -125,13 +159,15 @@ function hideLoadingView() {
  * */
 
 async function setupAndStart() {
-    fillTable();    
+    showLoadingView();
+    fillTable(); 
+    hideLoadingView();   
 }
 
 /** On click of start / restart button, set up game. */
 const btn = document.querySelector('#setup');
 btn.addEventListener('click', () => {
-    setupAndStart()
+    setupAndStart();
 });
 
 // Initializes categories so that first click of start button doesn't throw an error
