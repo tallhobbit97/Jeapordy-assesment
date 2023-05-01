@@ -9,8 +9,6 @@
 body {
   background-color: #115ff4;
   color: white;
-  /* display: flex;
-  justify-content: center; */
 }
 
 #container {
@@ -63,7 +61,6 @@ h1 {
   display: block;
   text-align: center;
   height: 80px;
-  left: 30%;
 }
 
 #loading-container{

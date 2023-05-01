@@ -151,7 +151,7 @@ function hideLoadingView() {
     const game = document.querySelector('#game-container');
     loader.style.display = 'none';
     game.style.display = 'inline-block';
-    $('#setup').text('Restart!');
+    $('#setup').text('Restart!').css({'background-color': '#8d2ab5', 'width': '100px'});
 }
 
 /** Start game:
@@ -166,8 +166,13 @@ async function setupAndStart() {
     await getCategoryIds();
     setTimeout(() => {
         if (categories.length === 6 && isTableFilled === false) { 
-            fillTable();
-            hideLoadingView(); 
+            try {
+                fillTable();
+                hideLoadingView();
+            } catch {
+                fillTable();
+                hideLoadingView();
+            } 
         }
     }, 1000);    
 }
@@ -175,6 +180,7 @@ async function setupAndStart() {
 /** On click of start / restart button, set up game. */
 const btn = document.querySelector('#setup');
 btn.addEventListener('click', () => {
+    $('#setup').css({'background-color': '#74119c', 'width': '125px'});
     setupAndStart();
 });
 
