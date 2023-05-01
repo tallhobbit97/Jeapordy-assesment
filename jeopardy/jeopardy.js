@@ -20,6 +20,7 @@
 
 const categories = [];
 let offset = 0;
+let isTableFilled = false;
 
 /** Get NUM_CATEGORIES random category from API.
  *
@@ -93,6 +94,7 @@ async function fillTable() {
             $qTd.on('click', (evt) => handleClick(evt));
         }
     }
+    isTableFilled = true;
 }
 
 /** Handle clicking on a clue: show the question or answer.
@@ -117,19 +119,18 @@ function handleClick(evt) {
         clue.showing = 'question';
         return false;
     }
-    // return false;
 }
 
 /** Wipe the current Jeopardy board, show the loading spinner,
  * and update the button used to fetch data.
  */
 
-async function showLoadingView() {
+function showLoadingView() {
     //lines 128-132 and 148-151 come from this source https://stackabuse.com/loading-animation-in-vanilla-javascript/
     const loader = document.querySelector('#loading-container');
-    const header = document.querySelector('#header-container');
+    const game = document.querySelector('#game-container');
     loader.style.display = 'block';
-    header.style.display = 'none';
+    game.style.display = 'none';
     categories.length = 0; //I got this solution form https://www.javascripttutorial.net/array/4-ways-empty-javascript-array/
     for (let i = 0; i < 6; i++){
         const $theadTd = $(`#cat-${i}`);
@@ -139,16 +140,16 @@ async function showLoadingView() {
             $qTd.empty();
         }
     }
-    return await getCategoryIds();
+    isTableFilled = false;
 }
 
 /** Remove the loading spinner and update the button used to fetch data. */
 
 function hideLoadingView() {
     const loader = document.querySelector('#loading-container');
-    const header = document.querySelector('#header-container');
+    const game = document.querySelector('#game-container');
     loader.style.display = 'none';
-    header.style.display = 'block';
+    game.style.display = 'block';
 }
 
 /** Start game:
@@ -160,8 +161,13 @@ function hideLoadingView() {
 
 async function setupAndStart() {
     showLoadingView();
-    fillTable(); 
-    hideLoadingView();   
+    await getCategoryIds();
+    setTimeout(() => {
+        if (categories.length === 6 && !isTableFilled) { 
+            fillTable();
+            hideLoadingView(); 
+        }
+    }, 1000);    
 }
 
 /** On click of start / restart button, set up game. */
@@ -171,4 +177,4 @@ btn.addEventListener('click', () => {
 });
 
 // Initializes categories so that first click of start button doesn't throw an error
-getCategoryIds();
+// getCategoryIds();
