@@ -111,7 +111,7 @@ function handleClick(evt) {
     if (clue.showing === 'answer'){
         return false;
     } else if (clue.showing === 'question'){
-        $(`#${question}`).empty().append(clue.answer);
+        $(`#${question}`).empty().append(clue.answer).addClass('answer');
         clue.showing = 'answer';
         return false;
     } else if (clue.showing === null){
@@ -126,18 +126,19 @@ function handleClick(evt) {
  */
 
 function showLoadingView() {
-    //lines 128-132 and 148-151 come from this source https://stackabuse.com/loading-animation-in-vanilla-javascript/
+    //lines 130-133 and 150-1513 come from this source https://stackabuse.com/loading-animation-in-vanilla-javascript/
     const loader = document.querySelector('#loading-container');
     const game = document.querySelector('#game-container');
-    loader.style.display = 'block';
+    loader.style.display = 'inline-block';
     game.style.display = 'none';
+    $('#setup').text('Loading...');
     categories.length = 0; //I got this solution form https://www.javascripttutorial.net/array/4-ways-empty-javascript-array/
     for (let i = 0; i < 6; i++){
         const $theadTd = $(`#cat-${i}`);
         $theadTd.empty();
         for (let j = 0; j <= 5; j++){
             const $qTd = $(`#q${i}-${j}`);
-            $qTd.empty();
+            $qTd.empty().removeClass('answer').off();
         }
     }
     isTableFilled = false;
@@ -149,7 +150,8 @@ function hideLoadingView() {
     const loader = document.querySelector('#loading-container');
     const game = document.querySelector('#game-container');
     loader.style.display = 'none';
-    game.style.display = 'block';
+    game.style.display = 'inline-block';
+    $('#setup').text('Restart!');
 }
 
 /** Start game:
@@ -163,7 +165,7 @@ async function setupAndStart() {
     showLoadingView();
     await getCategoryIds();
     setTimeout(() => {
-        if (categories.length === 6 && !isTableFilled) { 
+        if (categories.length === 6 && isTableFilled === false) { 
             fillTable();
             hideLoadingView(); 
         }

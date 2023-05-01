@@ -1,11 +1,86 @@
 /* some colors you may find useful:
-  #115ff4
-  #060ce9
-  #28a200
-  #8d2ab5
-  #74119c
+  #115ff4 - background blue
+  #060ce9 - game board blue blue
+  #28a200 - answer green
+  #8d2ab5 - start button purple
+  #74119c - deeper purple
 */
 
-/* #loading-container{
+body {
+  background-color: #115ff4;
+  color: white;
+  /* display: flex;
+  justify-content: center; */
+}
+
+#container {
+  display: flex;
+  justify-content: center;
+}
+
+button {
+  display: inline-block;
+  background-color: #8d2ab5;
+  color: white;
+  height: 40px;
+  width: 100px;
+  border: 1px solid #8d2ab5;
+  border-radius: 5px;
+}
+
+table {
+  display: inline-block;
+  height: 200px;
+}
+
+td {
+  background-color: #060ce9;
+  outline: 1px solid white;
+}
+
+thead td{
+  width: 150px;
+  height: 50px;
+  text-align: center;
+}
+
+tbody td {
+  width: 150px;
+  height: 100px;
+  text-align: center;
+}
+
+h1 {
+  display: block;
+  margin: 10px 0;
+}
+
+.answer {
+  background-color: #28a200;
+}
+
+#header-container {
+  display: block;
+  text-align: center;
+  height: 80px;
+  left: 30%;
+}
+
+#loading-container{
   display: none;
-} */
+  margin-top: 1.5em;
+  width: 200px;
+  height: 200px;
+}
+
+img {
+  width: 200px;
+  height: 200px;
+}
+
+#game-container{
+  display: none;
+  margin-top: 1.5em;
+  top: 80px;
+  height: 400px;
+}
